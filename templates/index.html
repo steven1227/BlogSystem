@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="static/mine.css">
+</head>
+
+<body>
+    <div class="detailBox">
+        <div class="titleBox">
+            <label>Comment Box</label>
+        </div>
+        <div class="commentBox">
+            <p class="taskDescription">留言板</p>
+        </div>
+        <div class="actionBox">
+            <ul class="commentList">
+                {% for item in comments%}
+                <li>
+                    <div class="commentText">
+                        <p class="">{{ item.text}} </p>
+                        <button type="button" data-pid={{item.id}} class="close" aria-hidden="true">&times;</button>
+                        <span class="date sub-text">{{ item.time}} </span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <input class="form-control" type="text" id="comment" placeholder="Your comments" />
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-info" id="publish">发送</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+    var init = function() {
+        var button = document.getElementById("publish");
+        button.addEventListener("click", function(e) {
+            e.preventDefault()
+            var comment = document.getElementById("comment");
+            if (comment.value) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (xhttp.readyState == 4 && xhttp.status == 200) {
+                        comment.value = "";
+                        location.reload();
+                    }
+                };
+                xhttp.open("POST", "/comment", true);
+                xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhttp.send("comment=" + comment.value);
+            } else {
+                console.log("不能为空");
+            }
+        })
+
+        var closes = document.querySelectorAll(".close");
+        for (var x = 0; x < closes.length; x++) {
+            closes[x].addEventListener("click", function(e) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (xhttp.readyState == 4 && xhttp.status == 200) {
+                        console.log("delete success");
+                        location.reload();
+                    }
+                };
+                xhttp.open("POST", "/delete", true);
+                xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhttp.send("pid=" + this.dataset.pid);
+            });
+        }
+    }
+
+    window.onload = function() {
+        init();
+    };
+    </script>
+</body>
+
+</html>
